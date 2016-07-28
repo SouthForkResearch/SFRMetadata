@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "SFR Metadata Module", "SFR Metadata Module.pyproj", "{D0F5E3E8-937B-4832-A0CB-CBA85508ADE4}"
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "SFR_Metadata_Module", "SFR_Metadata_Module.pyproj", "{ED8C4FE0-A3DB-4892-9C11-209F2D564043}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,8 +11,8 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D0F5E3E8-937B-4832-A0CB-CBA85508ADE4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D0F5E3E8-937B-4832-A0CB-CBA85508ADE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED8C4FE0-A3DB-4892-9C11-209F2D564043}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED8C4FE0-A3DB-4892-9C11-209F2D564043}.Release|Any CPU.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
