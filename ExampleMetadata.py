@@ -22,12 +22,18 @@ def main(metadatafile):
     mWriter.currentRun.addOutput("Output Name 2","Output Value 2")
 
     # Use addMessage to write messages to the file. 
-    mWriter.currentRun.addMessage("Info","Message Text 1")
-    mWriter.currentRun.addMessage("Warning","Warning Message Text 1")
+    mWriter.currentRun.addMessage("Info","Info Message Text")
+    mWriter.currentRun.addMessage("Warning","Warning Message Text")
+    mWriter.currentRun.addMessage("Error","Error Message Text")
+
+    # Use addCustomNode to write custom node tags to Information Node
+    mWriter.currentRun.addResult("CustomNode1","CustomValue1")
+    mWriter.currentRun.addResult("CustomNode2","CustomValue2")
 
     # When Processing is complete, stop the clock
-    mWriter.finalizeRun()
-    ## Repeat if in batch mode.
+    strToolStatus = "Success" # Optional status for the run
+    mWriter.finalizeRun(strToolStatus)
+    ## Repeat this block for each run if in batch mode.
 
     # At the very end, write the file. (Only do this at the very end if batching!)
     mWriter.writeMetadataFile(metadatafile)

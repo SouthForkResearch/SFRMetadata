@@ -5,7 +5,7 @@
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{ed8c4fe0-a3db-4892-9c11-209f2d564043}</ProjectGuid>
     <ProjectHome />
-    <StartupFile>Metadata.py</StartupFile>
+    <StartupFile>ExampleMetadata.py</StartupFile>
     <SearchPath />
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
@@ -13,6 +13,9 @@
     <LaunchProvider>Standard Python launcher</LaunchProvider>
     <InterpreterId />
     <InterpreterVersion />
+    <IsWindowsApplication>False</IsWindowsApplication>
+    <CommandLineArguments>"C:\GIS\TestMetadata0.3_A.xml"</CommandLineArguments>
+    <EnableNativeCodeDebugging>False</EnableNativeCodeDebugging>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)' == 'Debug'" />
   <PropertyGroup Condition="'$(Configuration)' == 'Release'" />
@@ -22,8 +25,19 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Metadata.py" />
-    <Compile Include="test.py" />
+    <Compile Include="ExampleMetadata.py" />
     <Compile Include="__init__.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Validation\" />
+    <Folder Include="Samples\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="README.md" />
+    <Content Include="Samples\SampleMetadata0.1.xml" />
+    <Content Include="Samples\SampleMetadata0.2.xml" />
+    <Content Include="Validation\MetadataValidation0.3.xsd" />
+    <Content Include="Samples\SampleMetadata0.3.xml" />
   </ItemGroup>
   <Import Project="$(PtvsTargetsFile)" Condition="Exists($(PtvsTargetsFile))" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.Common.targets" Condition="!Exists($(PtvsTargetsFile))" />

@@ -1,14 +1,11 @@
 """ Module for writing Metadata XML files for SFR GIS tools. 
     
     Author: kelly@southforkresearch.org
-    Version: 0.1
-    Date: 2016-Jul-2
-
-    License: 
+    Version: 0.3
+    Date: 2016-Sept-8
 """
 
 import xml.etree.ElementTree as ET
-#from xml.dom import minidom
 import datetime
 from getpass import getuser
 from socket import gethostname
@@ -18,22 +15,24 @@ class MetadataWriter():
 
     Runs = []
 
-    metadataVersion = "0.1"
+    metadataVersion = "0.3"
+    scriptVersion = "0.3"
     metadataType = "SFR Processing"
 
     def __init__(self,ToolName,ToolVersion,Operator="",GISVersion=""):
-        """Create a new instance of a Metadata File Object
+        """Create a new instance of a Metadata File Object.
         
-        MetadataFileName:
-
-        ToolName:
-
-        ToolVersion:
+        Arguments
+        MetadataFileName: Path and Name of output xml file
+        ToolName: Name of the tool or script
+        ToolVersion: Version of the Tool or Script
+        Keyword Arguments:
+        Operator (Optional): Name of the user. If not specified, the os username is used.
         """
 
         self.toolName = ToolName
         self.toolVersion = ToolVersion
-        self.gisVersion = GISVersion
+        #self.gisVersion = GISVersion
         self.computerID = gethostname()
 
         if Operator:
@@ -48,15 +47,15 @@ class MetadataWriter():
         """Create a new instance of a run"""
         self.currentRun = run()
 
-    def finalizeRun(self):
+    def finalizeRun(self,status=""):
         """Finish processing run and save to Metadata Runs"""
 
-        self.currentRun.finalize()
+        self.currentRun.finalize(status)
         self.Runs.append(self.currentRun)
 
     def writeMetadataFile(self,metadataFile):
         """ save the final metadata xml file"""
-        rootElement = ET.Element("Metadata",{"type":self.metadataType,"version":self.metadataVersion})
+        rootElement = ET.Element("Metadata",{"type":self.metadataType,"metadata_version":self.metadataVersion,"script_version":self.scriptVersion})
 
         nodeTool = ET.SubElement(rootElement,"Tool")
         ET.SubElement(nodeTool,"Name").text = self.toolName
@@ -65,15 +64,15 @@ class MetadataWriter():
         nodeProcessing = ET.SubElement(rootElement,"Processing")
         ET.SubElement(nodeProcessing,"ComputerID").text = self.computerID
         ET.SubElement(nodeProcessing,"Operator").text = self.operator
-        ET.SubElement(nodeProcessing,"GISVersion").text = self.gisVersion
+        #ET.SubElement(nodeProcessing,"GISVersion").text = self.gisVersion
 
         nodeRuns = ET.SubElement(nodeProcessing,"Runs")
         for run in self.Runs:
             nodeRun = ET.SubElement(nodeRuns,"Run",{"status":run.status})
 
-            ET.SubElement(nodeRun,"TimeStart").text = run.timestampStart.strftime('%Y-%m-%d %H:%M:%S')
-            ET.SubElement(nodeRun,"TimeStop").text = run.timestampStop.strftime('%Y-%m-%d %H:%M:%S')
-            ET.SubElement(nodeRun,"TotalProcessingTime").text = str(run.timeProcessing.total_seconds())
+            ET.SubElement(nodeRun,"TimeStart").text = run.timestampStart.strftime('%Y-%m-%dT%H:%M:%S')
+            ET.SubElement(nodeRun,"TimeStop").text = run.timestampStop.strftime('%Y-%m-%dT%H:%M:%S')
+            ET.SubElement(nodeRun,"TotalProcessingTime").text = str(run.timeProcessing.total_seconds()) # Need to provide attribute for unit of time
 
             nodeParameters = ET.SubElement(nodeRun,"Parameters")
             for parameter in run.Parameters:
@@ -83,24 +82,31 @@ class MetadataWriter():
 
             nodeOutputs = ET.SubElement(nodeRun,"Outputs")
             for output in run.Outputs:
-                nodeOutput = ET.SubElement(nodeOutputs,"Name").text = output.Name
-                nodeOutput = ET.SubElement(nodeOutputs,"Value").text = output.Value
+                nodeOutput = ET.SubElement(nodeOutputs,"Output")
+                ET.SubElement(nodeOutput,"Name").text = output.Name
+                ET.SubElement(nodeOutput,"Value").text = output.Value
 
-            nodeMesssages = ET.SubElement(nodeRun,"Messages")
+            nodeMessages = ET.SubElement(nodeRun,"Messages")
             for message in run.Messages:
-                nodeMessage = ET.SubElement(nodeOutputs,"Message",{"Level":message.Level}).text = message.Message
+                ET.SubElement(nodeMessages,"Message",{"Level":message.Level}).text = message.Message
 
+            nodeResults = ET.SubElement(nodeRun,"Results")
+            for result in run.Results:
+                ET.SubElement(nodeResults,result.Name).text = result.Value
+
+        #nodeSummary = ET.SubElement(nodeProcessing,"Summary")
+
+        indent(rootElement)
         tree = ET.ElementTree(rootElement)
         tree.write(metadataFile,'utf-8',True)
-        #writePrettyXML(metadataFile,rootElement)
         
-
 class run():
     """ Class that represents a tool run. """
     
     Parameters = []
     Outputs = []
     Messages = []
+    Results = []
 
     def __init__(self):
         """Get the start timestamp"""
@@ -120,6 +126,11 @@ class run():
         """Add a message to the processing run"""
         newMessage = message(severityLevel,messageText)
         self.Messages.append(newMessage)
+
+    def addResult(self,Name,Value):
+        """Add a custom Node to Information Node"""
+        newResult = result(Name,Value)
+        self.Results.append(newResult)
 
     def finalize(self,status=""):
         """Sets the stop timestamp and total processing time"""
@@ -146,14 +157,36 @@ class message():
         self.Level = level
         self.Message = message
 
+class result():
+    
+    def __init__(self,Name,Value):
+        self.Name = Name
+        self.Value = Value
 
-#def writePrettyXML(filename,element):
-#    """ return a pretty format xml"""
-#    #https://pymotw.com/2/xml/etree/ElementTree/create.html#pretty-printing-xml
+def indent(elem, level=0, more_sibs=False):
+    """ Pretty Print XML Element
+    Source: http://stackoverflow.com/questions/749796/pretty-printing-xml-in-python
+    """
 
-#    rough_string =ET.tostring(element, 'utf-8')
-#    reparsed = minidom.parseString(rough_string)
-
-#    with open(filename,"wt") as f:
-#        f.write(reparsed.toprettyxml(indent="  ",encoding='utf-8'))
-
+    i = "\n"
+    if level:
+        i += (level-1) * '  '
+    num_kids = len(elem)
+    if num_kids:
+        if not elem.text or not elem.text.strip():
+            elem.text = i + "  "
+            if level:
+                elem.text += '  '
+        count = 0
+        for kid in elem:
+            indent(kid, level+1, count < num_kids - 1)
+            count += 1
+        if not elem.tail or not elem.tail.strip():
+            elem.tail = i
+            if more_sibs:
+                elem.tail += '  '
+    else:
+        if level and (not elem.tail or not elem.tail.strip()):
+            elem.tail = i
+            if more_sibs:
+                elem.tail += '  '
