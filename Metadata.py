@@ -13,8 +13,6 @@ from socket import gethostname
 class MetadataWriter():
     """Object to store tool run metadata and write output xml file"""
 
-    Runs = []
-
     metadataVersion = "0.3"
     scriptVersion = "0.3"
     metadataType = "SFR Processing"
@@ -34,6 +32,8 @@ class MetadataWriter():
         self.toolVersion = ToolVersion
         #self.gisVersion = GISVersion
         self.computerID = gethostname()
+
+        self.Runs = []
 
         if Operator:
             self.operator = Operator
